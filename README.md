@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Politisk Filosofisk Online Forum
 
-## Getting Started
+Portfolio-projekt bygget med Next.js + Postgres + custom auth (email/password og magic-link).
 
-First, run the development server:
+## Quick start
+
+1) Installer afhængigheder
+
+```bash
+npm install
+```
+
+2) Opsæt miljøvariabler
+
+Lav en `.env` baseret på `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+3) Kør migrationer og seed data
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+4) Start appen
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Åbn http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Demo-login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Seed-scriptet opretter brugere, bl.a.:
 
-## Learn More
+- Email: `demo@demo.local`
+- Password: `demo1234`
 
-To learn more about Next.js, take a look at the following resources:
+## Auth-flow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Email/password: `/api/auth/register` og `/api/auth/login`
+- Magic-link: `/api/auth/magic-link` (i dev logges link til console)
+- Verificering: `/api/auth/magic-link/verify?token=...`
+- Email-bekræftelse: `/api/auth/verify-email` og `/api/auth/verify-email/confirm?token=...`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Email-bekræftelse kræves for at stemme og tilføje argumenter.
 
-## Deploy on Vercel
+## Database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Postgres bruges via Prisma. Skemaet findes i `prisma/schema.prisma`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment (cloud)
+
+1) Opret en hosted Postgres (fx Supabase, Neon, Render)
+2) Sæt env vars i hosting:
+
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `APP_URL` (fuld URL til din app)
+- `RESEND_API_KEY` og `EMAIL_FROM` (hvis du vil sende rigtige emails)
+
+3) Kør migrationer i produktion:
+
+```bash
+npx prisma migrate deploy
+```
+
+## Scripts
+
+- `npm run db:migrate` – kør lokale migrationer
+- `npm run db:seed` – seed demo-data
+- `npm run db:generate` – generér Prisma client

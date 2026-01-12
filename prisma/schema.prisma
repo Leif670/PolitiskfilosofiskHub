@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum VoteChoice {
+  YES
+  NO
+  UNDECIDED
+}
+
+enum ArgumentSide {
+  FOR
+  AGAINST
+}
+
+model User {
+  id           String           @id @default(cuid())
+  email        String           @unique
+  passwordHash String?
+  emailVerifiedAt DateTime?
+  createdAt    DateTime         @default(now())
+  votes        Vote[]
+  arguments    Argument[]
+  magicLinks   MagicLinkToken[]
+  emailVerifications EmailVerificationToken[]
+}
+
+model Question {
+  id        String     @id @default(cuid())
+  title     String
+  context   String
+  startsAt  DateTime
+  endsAt    DateTime
+  votes     Vote[]
+  arguments Argument[]
+  createdAt DateTime   @default(now())
+}
+
+model Vote {
+  id         String     @id @default(cuid())
+  userId     String
+  questionId String
+  choice     VoteChoice
+  createdAt  DateTime   @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([userId, questionId])
+}
+
+model Argument {
+  id         String       @id @default(cuid())
+  userId     String
+  questionId String
+  side       ArgumentSide
+  content    String
+  createdAt  DateTime     @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
+}
+
+model MagicLinkToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
