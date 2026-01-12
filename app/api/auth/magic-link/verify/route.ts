@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   });
 
   const authToken = createAuthToken(record.userId);
-  setAuthCookie(authToken);
+  await setAuthCookie(authToken);
 
   const redirectTo = process.env.APP_URL ?? request.nextUrl.origin;
   return NextResponse.redirect(`${redirectTo}/`);

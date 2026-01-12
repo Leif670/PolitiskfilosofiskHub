@@ -23,8 +23,9 @@ export function createAuthToken(userId: string) {
   return jwt.sign({ sub: userId }, secret, { expiresIn: `${TOKEN_TTL_DAYS}d` });
 }
 
-export function setAuthCookie(token: string) {
-  cookies().set(TOKEN_NAME, token, {
+export async function setAuthCookie(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(TOKEN_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -33,8 +34,9 @@ export function setAuthCookie(token: string) {
   });
 }
 
-export function clearAuthCookie() {
-  cookies().set(TOKEN_NAME, "", {
+export async function clearAuthCookie() {
+  const cookieStore = await cookies();
+  cookieStore.set(TOKEN_NAME, "", {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

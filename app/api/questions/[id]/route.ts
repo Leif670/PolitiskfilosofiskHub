@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 
-type Params = {
-  params: { id: string };
+type RouteContext = {
+  params: Promise<{ id: string }>;
 };
 
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(_request: Request, { params }: RouteContext) {
+  const { id } = await params;
   const question = await prisma.question.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { arguments: true },
   });
 
@@ -17,7 +18,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   const voteGroups = await prisma.vote.groupBy({
     by: ["choice"],
-    where: { questionId: params.id },
+    where: { questionId: id },
     _count: { _all: true },
   });
 

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { getUserIdFromRequest } from "@/app/lib/auth";
 
-type Params = {
-  params: { id: string };
+type RouteContext = {
+  params: Promise<{ id: string }>;
 };
 
-export async function POST(request: NextRequest, { params }: Params) {
+export async function POST(request: NextRequest, { params }: RouteContext) {
+  const { id } = await params;
   const userId = getUserIdFromRequest(request);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   const argument = await prisma.argument.create({
     data: {
       userId,
-      questionId: params.id,
+      questionId: id,
       side,
       content,
     },

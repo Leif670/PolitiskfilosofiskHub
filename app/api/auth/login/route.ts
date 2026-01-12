@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   }
 
   const token = createAuthToken(user.id);
-  setAuthCookie(token);
+  await setAuthCookie(token);
 
   return NextResponse.json({
     id: user.id,

@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   await sendEmail(email, subject, html);
 
   const authToken = createAuthToken(user.id);
-  setAuthCookie(authToken);
+  await setAuthCookie(authToken);
 
   return NextResponse.json({ id: user.id, email: user.email, emailVerifiedAt: null });
 }
